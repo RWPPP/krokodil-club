@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 200" role="img" aria-label="Чебурашка">
+ <ellipse cx="90" cy="190" rx="52" ry="7" fill="#000" opacity=".15"/>
+ <ellipse cx="90" cy="150" rx="43" ry="42" fill="#754b32"/><ellipse cx="90" cy="153" rx="29" ry="29" fill="#b68b65"/>
+ <ellipse cx="52" cy="185" rx="22" ry="10" fill="#583b2a"/><ellipse cx="128" cy="185" rx="22" ry="10" fill="#583b2a"/>
+ <ellipse cx="25" cy="68" rx="24" ry="32" fill="#754b32"/><ellipse cx="155" cy="68" rx="24" ry="32" fill="#754b32"/>
+ <ellipse cx="25" cy="68" rx="16" ry="24" fill="#bc926d"/><ellipse cx="155" cy="68" rx="16" ry="24" fill="#bc926d"/>
+ <ellipse cx="90" cy="70" rx="58" ry="56" fill="#754b32"/><ellipse cx="90" cy="77" rx="44" ry="40" fill="#dfb48b"/>
+ <ellipse cx="71" cy="72" rx="13" ry="17" fill="#fff9e8"/><ellipse cx="109" cy="72" rx="13" ry="17" fill="#fff9e8"/>
+ <ellipse cx="74" cy="75" rx="6" ry="10" fill="#29211d"/><ellipse cx="106" cy="75" rx="6" ry="10" fill="#29211d"/>
+ <circle cx="76" cy="70" r="2" fill="white"/><circle cx="108" cy="70" r="2" fill="white"/>
+ <ellipse cx="90" cy="87" rx="8" ry="5" fill="#442d22"/><path d="M 77 101 Q 88 91 100 101" fill="none" stroke="#442d22" stroke-width="3" stroke-linecap="round"/>
+ <path d="M 58 126 Q 35 134 36 152 M 122 126 Q 145 134 144 152" fill="none" stroke="#754b32" stroke-width="17" stroke-linecap="round"/>
+ <path d="M 90 128 C 108 149 113 156 101 169 C 83 185 63 163 77 148 C 78 161 87 160 85 147 Z" fill="#a9a4a0"/>
+ <path d="M 90 148 C 101 161 98 173 88 171 C 79 168 84 158 90 148" fill="#fff0a3"/>
+ </svg>
