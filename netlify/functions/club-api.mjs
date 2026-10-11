@@ -12,7 +12,7 @@ export default async function handler(req){
  if(path==='/auth/v1/token'){
   if([...query.keys()].some(k=>k!=='grant_type')||!['password','refresh_token'].includes(query.get('grant_type')))return response(400,'Неверный способ входа');
  }else if(url.search)return response(400,'Неверные параметры');
- const limit=path==='/rest/v1/rpc/club_portal'?1100000:16384;
+ const limit=path==='/rest/v1/rpc/club_portal'?2100000:16384;
  if(Number(req.headers.get('content-length')||0)>limit)return response(413,'Слишком большой запрос');
  const body=await req.text();
  if(new TextEncoder().encode(body).length>limit)return response(413,'Слишком большой запрос');
