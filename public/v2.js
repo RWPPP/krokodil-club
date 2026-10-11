@@ -83,13 +83,22 @@ function buildThemeEditor(){
 function fillThemeForm(t){buildThemeEditorOnce();for(const [key] of COLOR_FIELDS)document.getElementById('theme-'+key).value=t[key];for(const key of ['font','radius'])document.getElementById('theme-'+key).value=t[key];for(const key of Object.keys(IMAGE_FIELDS))document.getElementById('image-'+key).dataset.value=t[key]||''}
 let themeEditorBuilt=false;
 function buildThemeEditorOnce(){if(!themeEditorBuilt){buildThemeEditor();themeEditorBuilt=true}}
-function readThemeForm(){const t={};for(const [key,label] of COLOR_FIELDS){const input=document.getElementById('theme-'+key),value=input.value.trim();if(!/^#[0-9a-f]{6}$/i.test(value)){input.focus();throw Error(label+': введи HEX-код, например #22C05B')}t[key]=value.toUpperCase()}t.font=document.getElementById('theme-font').value;t.radius=Number(document.getElementById('theme-radius').value);if(!Number.isFinite(t.radius)||t.radius<0||t.radius>40)throw Error('Скругление: число от 0 до 40');for(const key of Object.keys(IMAGE_FIELDS))t[key]=document.getElementById('image-'+key).dataset.value||'';return t}
+function readThemeForm(){const t={};for(const [key,label] of COLOR_FIELDS){const input=document.getElementById('theme-'+key),value=input.value.trim();if(!/^#[0-9a-f]{6}$/i.test(value)){input.focus();throw Error(label+': введи HEX-код, например #22C05B')}t[key]=value.toUpperCase()}t.font=document.getElementById('theme-font').value;t.radius=Number(document.getElementById('theme-radius').value);if(!Number.isFinite(t.radius)||t.radius<0||t.radius>40)throw Error('Скругление: число от 0 до 40');for(const key of Object.keys(IMAGE_FIELDS))t[key]=document.getElementById('image-'+key).dataset.value||'';if(new TextEncoder().encode(JSON.stringify(t)).length>1900000)throw Error('Суммарный размер оформления слишком большой. Уменьши размер одного из файлов.');return t}
 function previewTheme(){try{const t=readThemeForm();themePreview=true;applyTheme(t);document.getElementById('themeStatus').textContent='Предпросмотр только у тебя. Нажми «Применить для всех», чтобы сохранить.'}catch(e){document.getElementById('themeStatus').textContent=e.message}}
 function saveTheme(){try{portalAction('save_theme',{theme:readThemeForm()})}catch(e){alert(e.message)}}
 function cancelThemePreview(){themePreview=false;fillThemeForm(savedTheme);applyTheme(savedTheme);document.getElementById('themeStatus').textContent='Предпросмотр отменён'}
 function clearThemeImage(key){document.getElementById('image-'+key).value='';document.getElementById('image-'+key).dataset.value='';previewTheme()}
 async function uploadThemeImage(input,key){
  const file=input.files?.[0];if(!file)return;
- if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>10000000){alert('Выбери PNG, JPEG или WebP размером до 10 МБ');input.value='';return}
- try{const bitmap=await createImageBitmap(file),canvas=document.createElement('canvas');const scale=Math.min(1,900/Math.max(bitmap.width,bitmap.height));canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();let data=canvas.toDataURL('image/webp',.8);if(data.length>180000)data=canvas.toDataURL('image/webp',.45);if(data.length>180000)throw Error('Картинка слишком сложная. Выбери изображение меньшего размера');input.dataset.value=data;previewTheme()}catch(e){alert(e.message);input.value=''}
+ const limit=key==='hero'?1000000:180000;
+ try{
+  if(!Object.hasOwn(IMAGE_FIELDS,key))throw Error('Неизвестная картинка');
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('Выбери PNG, JPEG или WebP');
+  if(Math.ceil(file.size/3)*4+50>limit)throw Error(key==='hero'?'Главная картинка слишком большая: нужен файл до 730 КБ. Качество автоматически не уменьшается.':'Картинка слишком большая: нужен файл до 130 КБ. Качество автоматически не уменьшается.');
+  const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('Не удалось прочитать картинку'));reader.readAsDataURL(file)});
+  if(typeof data!=='string'||data.length>limit||!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(data))throw Error('Не удалось загрузить изображение');
+  const bitmap=await createImageBitmap(file);bitmap.close();
+  // Original bytes: no canvas resizing or re-encoding.
+  input.dataset.value=data;previewTheme();
+ }catch(e){alert(e.message);input.value=''}
 }
