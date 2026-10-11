@@ -1,0 +1,20 @@
+:root{--club-radius:22px;--club-font:Arial,sans-serif}
+body,input,select,button{font-family:var(--club-font)!important}
+.panel,.day,.hero,.person{border-radius:var(--club-radius)!important}
+.profile-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:18px 0}
+.profile-card img.avatar{width:72px;height:72px;border-radius:50%;object-fit:cover}
+.profile-card .details{flex:1;min-width:180px}
+.profile-card h3{margin:0 0 6px}
+.vk-button{background:#0077ff!important;color:white!important;display:inline-block;text-decoration:none;padding:13px 20px;border-radius:14px;font-weight:bold;border:0;cursor:pointer}
+.cabinet-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);gap:18px}
+.lesson-card{background:var(--panel2);padding:18px;border-radius:16px;margin:10px 0;border:1px solid var(--line)}
+.lesson-card strong{display:block;margin-bottom:8px}.lesson-card .countdown{color:var(--yellow);font-weight:bold;margin-top:8px}
+.mascot{width:160px;height:180px;object-fit:contain;display:block;margin:0 auto}
+.streak-card{text-align:center}.streak-number{font-size:32px;font-weight:900;margin:10px 0}.streak-off .mascot{filter:grayscale(.85)}
+.theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.theme-grid input[type=color]{height:46px;width:100%;padding:4px}.theme-grid input[type=file]{width:100%;font-size:12px}
+.theme-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.theme-note{color:var(--muted);font-size:14px}
+.brand-upload{height:48px;max-width:140px;object-fit:contain;margin-right:10px}
+.club-banner{display:block;width:100%;max-height:280px;object-fit:cover;border-radius:var(--club-radius);margin:18px 0}
+.attendance-row{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:10px 0;padding:14px;background:var(--panel2);border-radius:14px}
+@media(max-width:700px){.cabinet-grid,.theme-grid{grid-template-columns:1fr}.nav{flex-wrap:wrap}.attendance-row{align-items:flex-start;flex-direction:column}.streak-card .mascot{width:130px;height:145px}}

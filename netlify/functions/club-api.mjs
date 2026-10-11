@@ -1,6 +1,6 @@
 const UPSTREAM='https://vfuhtmpjcshnsjticuzu.supabase.co';
 const PUBLIC_KEY='sb_publishable_krImotWHN9WdJriG2p60eQ_tk_xLbHi';
-const routes=new Set(['/auth/v1/signup','/auth/v1/token','/auth/v1/logout','/rest/v1/rpc/club_api']);
+const routes=new Set(['/auth/v1/signup','/auth/v1/token','/auth/v1/logout','/rest/v1/rpc/club_api','/rest/v1/rpc/club_portal']);
 const response=(status,message)=>Response.json({message},{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 export default async function handler(req){
  if(req.method!=='POST')return response(405,'Используйте POST');
@@ -12,9 +12,10 @@ export default async function handler(req){
  if(path==='/auth/v1/token'){
   if([...query.keys()].some(k=>k!=='grant_type')||!['password','refresh_token'].includes(query.get('grant_type')))return response(400,'Неверный способ входа');
  }else if(url.search)return response(400,'Неверные параметры');
- if(Number(req.headers.get('content-length')||0)>16384)return response(413,'Слишком большой запрос');
+ const limit=path==='/rest/v1/rpc/club_portal'?1100000:16384;
+ if(Number(req.headers.get('content-length')||0)>limit)return response(413,'Слишком большой запрос');
  const body=await req.text();
- if(new TextEncoder().encode(body).length>16384)return response(413,'Слишком большой запрос');
+ if(new TextEncoder().encode(body).length>limit)return response(413,'Слишком большой запрос');
  try{const parsed=JSON.parse(body);if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return response(400,'Неверные данные')}catch{return response(400,'Неверные данные')}
  const headers={'Content-Type':'application/json',apikey:PUBLIC_KEY};
  const authorization=req.headers.get('authorization');
