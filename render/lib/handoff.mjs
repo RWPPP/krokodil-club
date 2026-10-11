@@ -1,0 +1,5 @@
+import {randomBytes,createHash,timingSafeEqual} from 'node:crypto';
+const tickets=new Map();
+function purge(){for(const [id,item] of tickets)if(item.expires<Date.now())tickets.delete(id)}
+export function createTicket(session,challenge,state){purge();if(!/^[A-Za-z0-9_-]{43}$/.test(challenge||'')||!/^[A-Za-z0-9_-]{43}$/.test(state||''))throw Error('Invalid handoff');if(tickets.size>=1000)throw Error('Too many logins');const ticket=randomBytes(32).toString('base64url');tickets.set(ticket,{session,challenge,expires:Date.now()+120000});return ticket}
+export function redeemTicket(ticket,verifier){purge();if(!/^[A-Za-z0-9_-]{43}$/.test(ticket||'')||!/^[A-Za-z0-9_-]{43}$/.test(verifier||''))throw Error('Повтори вход через ВК');const item=tickets.get(ticket);if(!item)throw Error('Срок входа истёк. Повтори вход через ВК');const challenge=createHash('sha256').update(verifier).digest('base64url');if(!timingSafeEqual(Buffer.from(challenge),Buffer.from(item.challenge)))throw Error('Вход не подтверждён');tickets.delete(ticket);return item.session}
