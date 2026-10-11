@@ -102,3 +102,15 @@ async function uploadThemeImage(input,key){
   input.dataset.value=data;previewTheme();
  }catch(e){alert(e.message);input.value=''}
 }
+
+let initialLoading=true,loadingAttempt=0;
+async function finishInitialLoad(){
+ const attempt=++loadingAttempt;
+ const images=['uploadedLogo','heroImage'].map(id=>document.getElementById(id)).concat([...document.querySelectorAll('.nav-image')]).filter(img=>!img.hidden&&img.src);
+ let timer;
+ try{await Promise.race([Promise.all(images.map(img=>typeof img.decode==='function'?img.decode():Promise.resolve())),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Изображения ещё загружаются')),15000)})]);
+ if(attempt!==loadingAttempt)return;initialLoading=false;document.getElementById('siteLoader').hidden=true;document.body.classList.remove('site-loading');
+ }finally{clearTimeout(timer)}
+}
+function showLoadingError(){document.getElementById('siteLoader').classList.add('loading-error');document.getElementById('loadingTitle').textContent='Волна немного задержалась 💚';document.getElementById('loadingSubtitle').textContent='Не удалось загрузить сайт. Проверь интернет и попробуй ещё раз.';document.getElementById('loadingRetry').hidden=false}
+async function retryInitialLoad(){const button=document.getElementById('loadingRetry');button.hidden=true;document.getElementById('siteLoader').classList.remove('loading-error');document.getElementById('loadingTitle').textContent='Сейчас поймаем твою волну 💚';document.getElementById('loadingSubtitle').textContent='Загружаем музыкальный клуб';await refreshData()}
