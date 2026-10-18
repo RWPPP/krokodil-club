@@ -116,6 +116,7 @@ td{color:var(--text)}
 <style>
 body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#siteLoader{position:fixed;inset:0;z-index:9999;background:#141414;color:#f6f1e6;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:Onest,Segoe UI,system-ui,sans-serif}.loading-content{max-width:480px}.loading-ring{width:72px;height:72px;border:8px solid #174d2b;border-top-color:#22c05b;border-right-color:#22c05b;border-radius:50%;margin:0 auto 32px;animation:loading-spin 1s linear infinite}.loading-title{font-size:clamp(26px,5vw,38px);font-weight:800;line-height:1.25;margin:0 0 16px}.loading-subtitle{color:#aaa99f;font-size:16px;margin:0}.loading-guitar{width:38px;height:38px;color:#22c05b;margin:24px auto 0;display:block}#loadingRetry{margin:24px auto 0;background:#22c05b;color:#0a0a0a;padding:12px 22px;border:0;border-radius:12px;font:inherit;font-weight:700;cursor:pointer}#siteLoader.loading-error .loading-ring{animation:none}@keyframes loading-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.loading-ring{animation-duration:3s}}
 </style><link rel="stylesheet" href="./drums.css?v=1">
+<link rel="stylesheet" href="./booking-weeks.css?v=1">
 </head>
 <body class="site-loading">
 <div id="siteLoader" role="status" aria-live="polite"><div class="loading-content"><div class="loading-ring" aria-hidden="true"></div><p id="loadingTitle" class="loading-title">Сейчас поймаем<br>твою волну 💚</p><p id="loadingSubtitle" class="loading-subtitle">Загружаем музыкальный клуб</p><svg class="loading-guitar" viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(42 24 24)" fill="currentColor"><rect x="21" y="3" width="6" height="24" rx="2"/><rect x="19" y="2" width="10" height="9" rx="2"/><path d="M18 22c-6-1-9 4-6 9-6 3-5 12 2 15 5 2 15 2 20-3 5-5 4-10-2-12 3-5 0-10-6-9z"/><circle cx="24" cy="33" r="4" fill="#141414"/><rect x="19" y="40" width="10" height="2" fill="#141414"/></g></svg><button id="loadingRetry" hidden onclick="retryInitialLoad()">Попробовать ещё раз</button></div></div>
@@ -151,17 +152,17 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 </div><div class="weeknow" id="weekNow"></div>
   <div class="layout">
   <section class="panel">
-   <h3>Кто сегодня играет?</h3><p class="sub">Сначала познакомимся!</p>
+   <h3>Кто будет играть?</h3><p class="sub">Сначала познакомимся!</p>
    <div id="bookingLoginHint" class="hint">Для записи нужен вход через ВК. <button class="small" onclick="startVKLogin()">Войти через ВК</button></div><div class="field"><label for="name">Твоё имя</label><input id="name" placeholder="Например, Анна" maxlength="60"></div>
    <div class="field"><label for="instrument">Инструмент</label><select id="instrument" onchange="instrumentChanged()"><option value="acoustic">Акустическая гитара</option><option value="electric">Электрогитара</option><option value="bass">Бас-гитара</option><option value="drums">Барабаны</option></select></div>
    <label class="checkline" id="ownWrap"><input id="own" type="checkbox" onchange="renderSlots()"> У меня есть свой инструмент</label>
    <div id="guitarHint" class="hint">Клубные инструменты: 2 акустические, 3 электрогитары и 1 бас-гитара. Администратор может разрешить дополнительные места.</div>
    <div id="drumHint" class="hint hidden">Отметь все слоты, когда ты теоретически можешь прийти. Сначала система распределит учеников с наименьшим числом вариантов.</div>
-   <button class="primary" id="submitBtn" onclick="submitBooking()">Подтвердить запись</button>
+   <p id="bookingWindowNotice" role="status"></p><button class="primary" id="submitBtn" onclick="submitBooking()">Подтвердить запись</button>
    <p class="sub" style="margin:12px 0 0"><span id="connectionStatus" role="status">Подключение к клубу…</span><div id="myBookings" class="hint"></div></p>
   </section>
   <section class="panel">
-   <div class="sectionhead"><div><h3 id="scheduleTitle">Выбирай время</h3><p class="sub" style="margin:4px 0 0">Расписание на выбранную неделю</p></div><div class="week-toggle"><button id="oddBtn" class="active" onclick="setWeek('odd')">Нечётная неделя</button><button id="evenBtn" onclick="setWeek('even')">Чётная неделя</button></div></div>
+   <div class="sectionhead"><div><h3 id="scheduleTitle">Выбирай время</h3><p class="sub" style="margin:4px 0 0">Расписание на выбранную неделю</p></div><div class="week-toggle booking-weeks" aria-label="Выбор недели"><button id="studentWeek0" onclick="setWeek(0)" aria-pressed="false">Текущая — просмотр</button><button id="studentWeek1" onclick="setWeek(1)" aria-pressed="false">Следующая</button><button id="studentWeek2" onclick="setWeek(2)" aria-pressed="false">Через две недели</button></div></div>
    <p class="week-note" id="scheduleNote">Зелёная кнопка — выбранный слот. Вместимость зависит от инструмента.</p>
    <div id="schedule" class="days"></div>
   </section>
@@ -172,7 +173,7 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
  <div id="cabinetGrid" class="cabinet-grid hidden"><section class="panel"><h3>Будущие занятия</h3><div id="upcomingLessons"></div></section><section id="streakBox" class="panel streak-card"><img id="streakMascot" class="mascot" src="/assets/cheburashka-off.svg" alt="Чебурашка с огоньком"><div id="streakCount" class="streak-number">Огонёк ждёт тебя</div><p id="streakMessage"></p><p id="streakBest" class="sub"></p><p class="sub">Серию поддерживает посещение хотя бы раз в 7 дней. Администратор отмечает состоявшиеся занятия.</p></section></div>
 </section>
 <section id="adminView" class="hidden">
- <div class="hero compact"><div class="copy"><div class="eyebrow">Управление клубом</div><h2>Всё расписание под контролем</h2><p>Просматривай заявки, управляй местами и запускай распределение барабанщиков.</p></div><div class="week-toggle"><button id="adminOdd" class="active" onclick="setWeek('odd')">Нечётная неделя</button><button id="adminEven" onclick="setWeek('even')">Чётная неделя</button></div></div>
+ <div class="hero compact"><div class="copy"><div class="eyebrow">Управление клубом</div><h2>Всё расписание под контролем</h2><p>Просматривай заявки, управляй местами и запускай распределение барабанщиков.</p></div><div class="week-toggle booking-weeks" aria-label="Выбор недели"><button id="adminWeek0" onclick="setWeek(0)" aria-pressed="false">Текущая — просмотр</button><button id="adminWeek1" onclick="setWeek(1)" aria-pressed="false">Следующая</button><button id="adminWeek2" onclick="setWeek(2)" aria-pressed="false">Через две недели</button></div></div>
  <section class="panel" id="adminLogin"><h3>Вход администратора</h3><form onsubmit="loginAdmin(event)"><div class="field"><label for="adminEmail">Email</label><input id="adminEmail" type="email" autocomplete="username" required></div><div class="field"><label for="adminPassword">Пароль</label><input id="adminPassword" type="password" autocomplete="current-password" required></div><button>Войти</button></form></section><div id="adminSession" class="notice hidden">Вы вошли как администратор. <button class="small secondary" onclick="logoutAdmin()">Выйти</button></div>
  <div class="statrow"><div class="stat"><strong id="statBookings">0</strong><span>Записей на неделе</span></div><div class="stat"><strong id="statDrums">0</strong><span>Барабанщиков назначено</span></div><div class="stat"><strong id="statWait">0</strong><span>В ожидании</span></div></div>
  <div class="admin-grid">
@@ -185,7 +186,8 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 <div class="footer"><span>Крокодил · Музыкальный клуб ЛТУ</span><b>Обучение на инструментах, игра в группах и многое другое!</b></div>
 </div>
 <script src="./v2.js?render=1"></script>
-<script src="./drums.js?v=1"></script>
+<script src="./drums.js?v=2"></script>
+<script src="./booking-weeks.js?v=1"></script>
 <script>
 const DAYS=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 const SHORT=['Пн','Вт','Ср','Чт','Пт','Сб'];
@@ -216,11 +218,11 @@ function slotId(w,d,t){return `${w}-${d}-${t.replace(/[^0-9]/g,'')}`}
 function slotsFor(w){let a=[];SCHEDULE[w].forEach((day,di)=>day.forEach(([time,type])=>a.push({id:slotId(w,di,time),week:w,day:di,time,type})));return a}
 function getSlot(id){return slotsFor(week).find(s=>s.id===id)||slotsFor('odd').concat(slotsFor('even')).find(s=>s.id===id)}
 function capacity(s,inst){return (BASE[inst]||1)+(db.extras[s.id+'|'+inst]||0)}
-function legacySetWeek(w){week=w;selected=[];document.getElementById('oddBtn').classList.toggle('active',w==='odd');document.getElementById('evenBtn').classList.toggle('active',w==='even');document.getElementById('adminOdd').classList.toggle('active',w==='odd');document.getElementById('adminEven').classList.toggle('active',w==='even');document.getElementById('adminWeekLabel').textContent=w==='odd'?'Нечётная неделя':'Чётная неделя';renderSlots();renderAdmin()}
+function legacySetWeek(w){setWeek(w)}
 function instrumentChanged(){selected=[];const drums=document.getElementById('instrument').value==='drums';document.getElementById('ownWrap').classList.toggle('hidden',drums);document.getElementById('guitarHint').classList.toggle('hidden',drums);document.getElementById('drumHint').classList.toggle('hidden',!drums);document.getElementById('scheduleTitle').textContent=drums?'Когда ты можешь прийти?':'Выбирай время';document.getElementById('scheduleNote').textContent=drums?'Отметь все подходящие будущие слоты, даже занятые: при распределении возможны перестановки. Это предпочтения, не подтверждённая запись.':'Выбери один слот на неделю.';renderSlots()}
 function renderSlots(){const inst=document.getElementById('instrument').value,own=document.getElementById('own').checked,drums=inst==='drums';const root=document.getElementById('schedule');root.innerHTML='';SCHEDULE[week].forEach((day,di)=>{let card=document.createElement('div');card.className='day';let head=document.createElement('div');head.className='dayhead';head.innerHTML=`<strong>${DAYS[di]}</strong><span>${SHORT[di]}</span>`;card.appendChild(head);day.forEach(([time,type])=>{let s={id:slotId(week,di,time),week,day:di,time,type};let el=document.createElement('div');el.className='slot';let typeLabel=type==='guitar'?'Гитарное занятие':'Барабаны';let valid=drums?type==='drums':type==='guitar';let key=drums?'drums':inst;let count=booked(s,key),cap=drums?1:capacity(s,key),isSelected=selected.includes(s.id);let full=!own&&!drums&&count>=cap;let drumTaken=booked(s,'drums')>0;if(drums&&drumTaken)full=true;
- el.innerHTML=`<div class="slottime">${time}</div><div class="slotname ${type}">${typeLabel}</div>`;let btn=document.createElement('button');btn.textContent=drums?(isSelected?'✓ Выбрано':(drumTaken?'Могу прийти · занято':'Могу прийти')):(isSelected?'✓ Выбрано':(full?'Мест нет':'Выбрать'));btn.disabled=!valid||(!drums&&full&&!own)||(drums&&!!drumSlotInfo(s.id)?.past);btn.className=isSelected?'chosen':'';btn.onclick=()=>{if(drums){selected=isSelected?selected.filter(x=>x!==s.id):selected.concat(s.id)}else{selected=[s.id]}renderSlots()};el.appendChild(btn);
- let capText=type==='drums'?(drumTaken?(drums?'Занято · можно указать доступность':'Занято'):(drums?'1 место':'Занятие на барабанах')): (own?'Свой инструмент · место не занимает':`${count}/${cap} клубных мест занято`);let meta=document.createElement('div');meta.className='capacity';meta.textContent=capText;el.appendChild(meta);if(!valid){btn.disabled=true;btn.textContent='Другой инструмент'}card.appendChild(el)});root.appendChild(card)});document.getElementById('submitBtn').textContent=drums?'Отправить доступность':'Подтвердить запись';applyScheduleColors();}
+ el.innerHTML=`<div class="slottime">${time}</div><div class="slotname ${type}">${typeLabel}</div>`;let btn=document.createElement('button');btn.textContent=drums?(isSelected?'✓ Выбрано':(drumTaken?'Могу прийти · занято':'Могу прийти')):(isSelected?'✓ Выбрано':(full?'Мест нет':'Выбрать'));btn.disabled=!isBookingWeekOpen()||!valid||(!drums&&full&&!own)||(drums&&!!drumSlotInfo(s.id)?.past);btn.className=isSelected?'chosen':'';btn.onclick=()=>{if(drums){selected=isSelected?selected.filter(x=>x!==s.id):selected.concat(s.id)}else{selected=[s.id]}renderSlots()};el.appendChild(btn);
+ let capText=type==='drums'?(drumTaken?(drums?'Занято · можно указать доступность':'Занято'):(drums?'1 место':'Занятие на барабанах')): (own?'Свой инструмент · место не занимает':`${count}/${cap} клубных мест занято`);let meta=document.createElement('div');meta.className='capacity';meta.textContent=capText;el.appendChild(meta);if(!valid){btn.disabled=true;btn.textContent='Другой инструмент'}card.appendChild(el)});root.appendChild(card)});document.getElementById('submitBtn').textContent=drums?'Отправить доступность':'Подтвердить запись';applyScheduleColors();updateBookingState();}
 function renderAdmin(){let bs=bookingsForWeek(week);let assigned=bs.filter(b=>b.status==='assigned'&&b.slotId),wait=bs.filter(b=>b.status==='waitlist'||b.status==='pending');document.getElementById('statBookings').textContent=assigned.length;document.getElementById('statDrums').textContent=assigned.filter(b=>b.instrument==='drums').length;document.getElementById('statWait').textContent=wait.length;
  let root=document.getElementById('requests');renderDrumsRequests(root,bs);
  let cc=document.getElementById('capacityControls');cc.innerHTML='';let gs=slotsFor(week).filter(s=>s.type==='guitar');gs.forEach(s=>{let row=document.createElement('div');row.className='person';row.style.marginTop='8px';let extras=Object.keys(BASE).map(inst=>`${INSTR[inst]}: +${db.extras[s.id+'|'+inst]||0}`).join(' · ');row.innerHTML=`<div><strong>${DAYS[s.day]} · ${s.time}</strong><small>${extras}</small></div><div class="person-actions">${Object.keys(BASE).map(inst=>`<button class="small secondary" onclick="addExtra('${s.id}','${inst}')">+ ${inst==='acoustic'?'ак.':inst==='electric'?'эл.':'бас'}</button>`).join('')}</div>`;cc.appendChild(row)});
@@ -247,7 +249,7 @@ function refreshStudyWeek(){
  label.innerHTML=info.number>=1?`Сейчас <b>${info.number}-я</b> неделя — ${info.parity==='even'?'чётная':'нечётная'}`:'Учебный год ещё не начался';
  label.title='По московскому времени. Первая учебная неделя начинается '+FIRST_STUDY_MONDAY;
  // Переключаем расписание при первом открытии и при смене учебной недели.
- if(lastStudyWeek!==info.number){setWeek(info.number>=1?info.parity:'odd');lastStudyWeek=info.number}
+ const calendarMonday=currentBookingMonday();if(lastStudyWeek!==calendarMonday){lastStudyWeek=calendarMonday;setWeek(1)}else refreshWeekControls();
 }
 const SUPABASE_URL='https://krokodil-proxy-test.onrender.com/club-api';
 const PUBLIC_KEY='sb_publishable_krImotWHN9WdJriG2p60eQ_tk_xLbHi';
@@ -271,31 +273,31 @@ async function ensureSessionOnce(){
 }
 let authPending=null;
 async function ensureSession(){if(!authPending)authPending=ensureSessionOnce().finally(()=>{authPending=null});return authPending}
-function selectedMonday(){
- const info=studyWeekInfo(),current=new Date(info.start+Math.floor((info.number-1))*7*DAY_MS);
- if(info.parity!==week)current.setUTCDate(current.getUTCDate()+7);
- return current.toISOString().slice(0,10);
-}
+function selectedMonday(){return viewedWeekMonday||shiftBookingDate(currentBookingMonday(),7)}
 function booked(s,inst){return Number(occupancy[s.id+'|'+inst]||0)}
 function bookingsForWeek(w){return w===week?db.bookings:[]}
 function applySnapshot(data){
- isAdmin=data.admin;FIRST_STUDY_MONDAY=data.firstMonday;db={bookings:data.bookings,extras:data.extras};occupancy=data.occupancy;onlineReady=true;
+ isAdmin=data.admin;FIRST_STUDY_MONDAY=data.firstMonday;week=weekParity(data.monday);db={bookings:data.bookings,extras:data.extras};occupancy=data.occupancy;onlineReady=true;
  renderSlots();renderAdmin();refreshStudyWeek();
  document.getElementById('adminLogin').classList.toggle('hidden',isAdmin);
  document.getElementById('adminSession').classList.toggle('hidden',!isAdmin);
  for(const el of document.querySelectorAll('#adminView .statrow,#adminView .admin-grid,#adminView .tablewrap'))el.classList.toggle('hidden',!isAdmin);
  document.getElementById('myBookings').innerHTML=db.bookings.length?db.bookings.map(b=>{const s=b.slotId?getSlot(b.slotId):null;return `<div>${esc(b.name)} · ${INSTR[b.instrument]} · ${s?DAYS[s.day]+' '+s.time:b.status==='waitlist'?'Ожидание':'Доступность отправлена'}</div>`}).join(''):'Ваших заявок на эту неделю пока нет.';
  statusText('Общая база · неделя с '+data.monday);
- const current=studyWeekInfo();
- for(const parity of ['odd','even']){const base=new Date(current.start+(current.number-1)*7*DAY_MS+(current.parity===parity?0:7*DAY_MS));const text=(parity==='odd'?'Нечётная':'Чётная')+' · с '+base.toISOString().slice(0,10);document.getElementById(parity+'Btn').textContent=text;document.getElementById(parity==='odd'?'adminOdd':'adminEven').textContent=text}
+ refreshWeekControls();updateBookingState();
 }
 async function refreshData(){
  const version=++requestVersion,monday=selectedMonday();onlineReady=false;document.getElementById('submitBtn').disabled=true;
  try{await ensureSession();const [data,portal]=await Promise.all([request('/rest/v1/rpc/club_api',{action:'snapshot',payload:{monday}},authSession.access_token),request('/rest/v1/rpc/club_portal',{action:'snapshot',payload:{}},authSession.access_token)]);if(version===requestVersion&&monday===selectedMonday()){applySnapshot(data);renderPortal(portal);if(initialLoading)await finishInitialLoad()}}
  catch(e){if(version===requestVersion){statusText('Подключение не готово: '+(e.name==='AbortError'?'Сервер долго не отвечает. Попробуйте обновить страницу.':e.message));onlineReady=false;if(initialLoading)showLoadingError()}}
- finally{if(version===requestVersion)document.getElementById('submitBtn').disabled=!onlineReady||busy}
+ finally{if(version===requestVersion)updateBookingState()}
 }
-function setWeek(w){legacySetWeek(w);db={bookings:[],extras:{}};occupancy={};renderSlots();renderAdmin();if(authSession)refreshData()}
+function setWeek(offset){
+ if(!Number.isInteger(offset)||offset<0||offset>2)return;
+ viewedWeekMonday=shiftBookingDate(currentBookingMonday(),offset*7);week=weekParity(viewedWeekMonday);selected=[];
+ ++requestVersion;db={bookings:[],extras:{}};occupancy={};onlineReady=false;
+ renderSlots();renderAdmin();refreshWeekControls();updateBookingState();if(authSession)refreshData();
+}
 function showView(v){for(const [view,tab,key] of [['studentView','studentTab','student'],['cabinetView','cabinetTab','cabinet'],['adminView','adminTab','admin']]){document.getElementById(view).classList.toggle('hidden',v!==key);document.getElementById(tab).classList.toggle('active',v===key)}if(v==='admin'||v==='cabinet')refreshData()}
 
 async function mutate(action,payload){
@@ -303,9 +305,10 @@ async function mutate(action,payload){
  busy=true;document.getElementById('submitBtn').disabled=true;const monday=selectedMonday();++requestVersion;
  try{await ensureSession();const data=await request('/rest/v1/rpc/club_api',{action,payload:{...payload,monday}},authSession.access_token);selected=[];if(monday===selectedMonday()){applySnapshot(data);await loadPortal()}else await refreshData();return true}
  catch(e){alert(e.message);await refreshData();return false}
- finally{busy=false;document.getElementById('submitBtn').disabled=!onlineReady}
+ finally{busy=false;updateBookingState()}
 }
 async function submitBooking(){
+ if(!isBookingWeekOpen()){updateBookingState();alert('Запись открыта только на две следующие недели. Текущая — для просмотра.');return}
  if(!portalData.profile&&!isAdmin){showCabinet();alert('Сначала войди через ВК');return}
  const name=document.getElementById('name').value.trim(),instrument=document.getElementById('instrument').value;
  if(!name){alert('Введи имя');return}if(!selected.length){alert('Выбери время');return}

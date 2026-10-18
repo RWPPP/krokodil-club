@@ -85,5 +85,5 @@ async function autoAssignDrums(){
   const button=document.createElement('button');button.textContent=changes.length?'Применить изменения':'Изменений нет';button.disabled=!changes.length;
   button.onclick=async()=>{if(selectedMonday()!==monday){alert('Выбрана другая неделя. Откройте предпросмотр заново.');dialog.close();return}if(busy)return;button.disabled=true;const ok=await mutate('apply_drums',{planToken:plan.token});if(ok)dialog.close();else{button.disabled=true;const note=document.createElement('p');note.textContent='Не удалось применить. Закройте окно и получите новый предпросмотр.';body.appendChild(note)}};
   body.appendChild(button);
- }catch(e){alert(e.message)}finally{busy=false;document.getElementById('submitBtn').disabled=!onlineReady}
+ }catch(e){alert(e.message)}finally{busy=false;updateBookingState()}
 }
