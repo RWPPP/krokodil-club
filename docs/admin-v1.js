@@ -86,6 +86,7 @@ async function adminPortalAction(action,payload={}){
 function toggleAdminNotifications(){adminUI.noticesOpen=!adminUI.noticesOpen;renderAdminBell()}
 function adminCreatedLabel(value){return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}).format(new Date(value))+' МСК'}
 async function openAdminNotice(notice){
+ const requestPanel=document.getElementById('adminRequestsPanel');if(requestPanel)requestPanel.open=true;
  await adminPortalAction('notification_read',{id:notice.id});
  if(!notice.bookingId||!adminAllBookings().some(b=>b.id===notice.bookingId)){alert('Заявка удалена или уже вне архива. Данные на момент записи сохранены в уведомлении.');return}
  adminUI.scope='all';adminUI.period='all';adminUI.instrument='all';adminUI.search='';adminUI.highlight=notice.bookingId;adminUI.noticesOpen=false;
