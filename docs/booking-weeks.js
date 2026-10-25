@@ -21,7 +21,7 @@ function refreshWeekControls(){
 }
 function updateBookingState(){
  const open=isBookingWeekOpen(),button=document.getElementById('submitBtn'),notice=document.getElementById('bookingWindowNotice');
- button.disabled=!open||!onlineReady||busy;
+ button.disabled=!open||!onlineReady||busy||(releaseMaintenance.mode==='full'&&!isAdmin);
  button.textContent=open?(document.getElementById('instrument').value==='drums'?'Отправить доступность':'Подтвердить запись'):'Текущая неделя — только просмотр';
  document.getElementById('scheduleTitle').textContent=open?(document.getElementById('instrument').value==='drums'?'Когда ты можешь прийти?':'Выбирай время'):'Расписание текущей недели';
  if(!open)document.getElementById('scheduleNote').textContent='Неделя уже началась. Запись закрыта, расписание доступно для просмотра.';

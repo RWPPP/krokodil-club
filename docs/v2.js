@@ -39,7 +39,7 @@ function renderStreak(theme=savedTheme){
  document.getElementById('streakBest').textContent='Всего дней занятий: '+info.total+' · Лучшая серия: '+info.best;
 }
 function renderPortal(data){
- portalData=data;savedTheme={...DEFAULT_THEME,...data.theme};if(!themePreview)applyTheme(savedTheme);
+ portalData=data;if(data.maintenance&&!releaseMaintenance.emergency)releaseMaintenance=data.maintenance;renderReleaseState();savedTheme={...DEFAULT_THEME,...data.theme};if(!themePreview)applyTheme(savedTheme);
  const profile=data.profile,photo=document.getElementById('profileAvatar'),name=document.getElementById('profileName');
  name.textContent=profile?.name||'Личный кабинет';photo.hidden=!(profile?.avatar&&/^https:\/\//.test(profile.avatar));if(!photo.hidden)photo.src=profile.avatar;
  document.getElementById('profileHint').textContent=profile?'Твои занятия и музыкальный прогресс':'Войди через ВК, чтобы видеть свои занятия на любом устройстве.';

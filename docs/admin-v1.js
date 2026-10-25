@@ -49,6 +49,8 @@ function renderAdminRequests(){
    for(const choice of choices){const li=adminEl('li',choice.info?.label||choice.id);const other=adminAllBookings().find(o=>o.id!==b.id&&o.monday===monday&&o.instrument==='drums'&&o.status==='assigned'&&o.slotId===choice.id);li.appendChild(adminEl('small',choice.info?.past?'Началось / прошло':choice.id===b.slotId?'Назначен сюда':other?'Занято: '+other.name:'Свободно'));list.appendChild(li)}availability.appendChild(list);details.appendChild(availability);
   }
   const actions=adminEl('div',undefined,'person-actions'),offset=(Date.parse(monday)-Date.parse(currentBookingMonday()))/(7*86400000),editable=[0,1,2].includes(offset);
+  const manual=portalData.manualBookings?.find(x=>x.id===b.id);
+  if(manual){details.appendChild(adminEl('small',manual.userId?'Добавлено администратором':'Добавлено администратором · без аккаунта'));if(editable&&!info.past&&!info.ended&&!b.outcome){const edit=adminButton('Изменить',()=>openManualBooking(b,manual));edit.disabled=busy;actions.appendChild(edit)}}
   if(editable&&b.instrument==='drums'&&!info.ended&&!b.outcome){const button=adminButton(b.slotId?'Переназначить':'Назначить',async()=>{if(await adminPrepareWeek(monday))await assignOne(b.id)});button.disabled=busy||!!(b.slotId&&info.past);actions.appendChild(button)}
   if(editable){const button=adminButton('Удалить',async()=>{if(await adminPrepareWeek(monday))await removeBooking(b.id)},'small danger');button.disabled=busy;actions.appendChild(button)}
   row.append(details,actions);root.appendChild(row);

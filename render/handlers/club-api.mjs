@@ -1,6 +1,6 @@
 const UPSTREAM='https://vfuhtmpjcshnsjticuzu.supabase.co';
 const PUBLIC_KEY='sb_publishable_krImotWHN9WdJriG2p60eQ_tk_xLbHi';
-const routes=new Set(['/auth/v1/signup','/auth/v1/token','/auth/v1/logout','/rest/v1/rpc/club_api','/rest/v1/rpc/club_portal']);
+const routes=new Set(['/auth/v1/signup','/auth/v1/token','/auth/v1/logout','/rest/v1/rpc/club_api','/rest/v1/rpc/club_maintenance','/rest/v1/rpc/club_portal']);
 const response=(status,message)=>Response.json({message},{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 export default async function handler(req){
  if(req.method!=='POST')return response(405,'Используйте POST');
@@ -12,14 +12,19 @@ export default async function handler(req){
  if(path==='/auth/v1/token'){
   if([...query.keys()].some(k=>k!=='grant_type')||!['password','refresh_token'].includes(query.get('grant_type')))return response(400,'Неверный способ входа');
  }else if(url.search)return response(400,'Неверные параметры');
+ const emergency=process.env.MAINTENANCE_MODE==='full';
+ if(path==='/rest/v1/rpc/club_maintenance'&&emergency)return Response.json({mode:'full',message:(process.env.MAINTENANCE_MESSAGE||'Настраиваем нашу музыкальную волну 💚 Скоро вернёмся').slice(0,500),emergency:true},{headers:{'Cache-Control':'no-store'}});
  const limit=path==='/rest/v1/rpc/club_portal'?2100000:16384;
  if(Number(req.headers.get('content-length')||0)>limit)return response(413,'Слишком большой запрос');
  const body=await req.text();
  if(new TextEncoder().encode(body).length>limit)return response(413,'Слишком большой запрос');
- try{const parsed=JSON.parse(body);if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return response(400,'Неверные данные')}catch{return response(400,'Неверные данные')}
+ let parsed;try{parsed=JSON.parse(body);if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return response(400,'Неверные данные')}catch{return response(400,'Неверные данные')}
  const headers={'Content-Type':'application/json',apikey:PUBLIC_KEY};
  const authorization=req.headers.get('authorization');
  if(authorization){if(!authorization.startsWith('Bearer ')||authorization.length>8192)return response(400,'Неверная сессия');headers.Authorization=authorization}
+ if(emergency&&path==='/rest/v1/rpc/club_api'&&parsed.action==='submit'){
+  try{const check=await fetch(UPSTREAM+'/rest/v1/rpc/club_portal',{method:'POST',headers,body:JSON.stringify({action:'snapshot',payload:{}}),redirect:'error',signal:AbortSignal.timeout(10000)});const identity=await check.json();if(!check.ok||identity.admin!==true)return response(503,'Идут технические работы. Запись временно закрыта')}catch{return response(503,'Идут технические работы. Запись временно закрыта')}
+ }
  try{
   const upstream=await fetch(UPSTREAM+path+url.search,{method:'POST',headers,body,redirect:'error',signal:AbortSignal.timeout(25000)});
   const data=await upstream.text();
