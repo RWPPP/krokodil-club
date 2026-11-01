@@ -173,7 +173,7 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 </section>
 <section id="cabinetView" class="hidden">
  <section class="panel profile-card"><img id="profileAvatar" class="avatar" hidden alt="Фото профиля"><div class="details"><h3 id="profileName">Личный кабинет</h3><p class="sub" id="profileHint">Войди через ВК, чтобы видеть свои занятия на любом устройстве.</p></div><button id="vkLoginBtn" class="vk-button" onclick="startVKLogin()">Войти через ВК</button><button id="studentLogout" class="secondary hidden" onclick="logoutAdmin()">Выйти</button></section>
- <div id="cabinetGrid" class="cabinet-grid hidden"><section class="panel"><h3>Будущие занятия</h3><div id="upcomingLessons"></div></section><section id="streakBox" class="panel streak-card"><img id="streakMascot" class="mascot" src="/assets/cheburashka-off.svg" alt="Чебурашка с огоньком"><div id="streakCount" class="streak-number">Огонёк ждёт тебя</div><p id="streakMessage"></p><p id="streakBest" class="sub"></p><p class="sub">Серию поддерживает посещение хотя бы раз в 7 дней. Администратор отмечает состоявшиеся занятия.</p></section></div>
+ <div id="cabinetGrid" class="cabinet-grid hidden"><section class="panel"><h3>Будущие занятия</h3><div id="upcomingLessons"></div></section><section id="streakBox" class="panel streak-card"><img id="streakMascot" class="mascot" src="/assets/cheburashka-off.svg" alt="Чебурашка с огоньком"><div id="streakCount" class="streak-number">Огонёк ждёт тебя</div><p id="streakMessage"></p><p id="streakBest" class="sub"></p><p class="sub">Посещение барабанов поддерживает огонёк 14 дней, гитары — 7 дней. Учитываются только отмеченные посещения.</p></section></div>
 </section>
 <section id="adminView" class="hidden">
  <div class="hero compact"><div class="copy"><div class="eyebrow">Управление клубом</div><h2>Всё расписание под контролем</h2><p>Просматривай заявки, управляй местами и запускай распределение барабанщиков.</p></div><div class="week-toggle booking-weeks" aria-label="Выбор недели"><button id="adminWeek0" onclick="setWeek(0)" aria-pressed="false">Текущая — просмотр</button><button id="adminWeek1" onclick="setWeek(1)" aria-pressed="false">Следующая</button><button id="adminWeek2" onclick="setWeek(2)" aria-pressed="false">Через две недели</button></div></div>
@@ -188,12 +188,12 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 </div><div id="adminStudentsTab" role="tabpanel" aria-labelledby="adminTabStudents" hidden></div><div id="adminDesignTab" role="tabpanel" aria-labelledby="adminTabDesign" hidden><section id="themeEditor" class="panel hidden" style="margin-top:18px"><h3>Оформление сайта</h3><p class="sub">Меняй цвета и готовые картинки. Предпросмотр виден только тебе до применения.</p><p id="hexHelp" class="theme-note">Все цвета: HEX #RRGGBB, например #22C05B. PNG, JPEG, WebP — без сжатия и обрезки. Главная картинка: до 730 КБ; остальные: до 130 КБ.</p><div id="themeImages" class="theme-grid"></div><div id="themeColors"></div><div class="theme-grid"><div class="field"><label for="theme-font">Шрифт</label><select id="theme-font" onchange="previewTheme()"><option value="system">Основной</option><option value="serif">С засечками</option><option value="rounded">Мягкий</option></select></div><div class="field"><label for="theme-radius">Скругления, px</label><input id="theme-radius" type="number" min="0" max="40" onchange="previewTheme()"></div></div><div class="theme-actions"><button onclick="previewTheme()">Предпросмотр</button><button onclick="saveTheme()">Применить для всех</button><button class="secondary" onclick="cancelThemePreview()">Отменить предпросмотр</button><button class="secondary" onclick="portalAction('restore_theme',{})">Вернуть предыдущую тему</button></div><p id="themeStatus" class="theme-note" role="status"></p></section></div></div></section>
 <div class="footer"><span>Крокодил · Музыкальный клуб ЛТУ</span><b>Обучение на инструментах, игра в группах и многое другое!</b></div>
 </div>
-<script src="./v2.js?update=2"></script>
+<script src="./v2.js?update=2.2"></script>
 <script src="./drums.js?v=2"></script>
 <script src="./booking-weeks.js?update=2"></script>
 <script src="./admin-v1.js?update=2.1"></script>
 <script src="./release-1.1.js?v=1"></script>
-<script src="./update-2.js?v=2.1"></script>
+<script src="./update-2.js?v=2.2"></script>
 <script>
 const DAYS=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 const SHORT=['Пн','Вт','Ср','Чт','Пт','Сб'];

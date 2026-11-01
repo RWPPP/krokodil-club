@@ -7,12 +7,14 @@ function moscowDate(now=new Date()){const p=new Intl.DateTimeFormat('en-GB',{tim
 function dayIndex(date){return Math.floor(Date.parse(date+'T00:00:00Z')/86400000)}
 function dateLabel(date){return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',timeZone:'UTC'}).format(new Date(date+'T00:00:00Z'))}
 function daysWord(n){const a=n%10,b=n%100;return a===1&&b!==11?'день':a>=2&&a<=4&&(b<12||b>14)?'дня':'дней'}
-function streakInfo(dates,today=moscowDate()){
- const days=[...new Set(dates.filter(d=>d<=today))].sort();let count=0,best=0,last=null;
- for(const d of days){count=last===null||dayIndex(d)-dayIndex(last)>7?1:count+1;best=Math.max(best,count);last=d}
- const age=last===null?null:dayIndex(today)-dayIndex(last),active=last!==null&&age<=7;
- return {count:active?count:0,best,total:days.length,active,remaining:active?7-age:null,last,due:last?new Date((dayIndex(last)+7)*86400000).toISOString().slice(0,10):null};
+function streakInfo(dates,today=moscowDate(),windows=[]){
+ const grace=new Map();for(const w of windows||[]){if(w&&typeof w.date==='string')grace.set(w.date,Math.max(grace.get(w.date)||7,w.days===14?14:7))}
+ const days=[...new Set((dates||[]).filter(d=>d<=today))].sort();let count=0,best=0,last=null,deadline=null;
+ for(const d of days){const index=dayIndex(d);if(deadline===null||index>deadline){count=1;deadline=index+(grace.get(d)||7)}else{count++;deadline=Math.max(deadline,index+(grace.get(d)||7))}best=Math.max(best,count);last=d}
+ const active=deadline!==null&&dayIndex(today)<=deadline;
+ return {count:active?count:0,best,total:days.length,active,remaining:active?deadline-dayIndex(today):null,last,due:deadline!==null?new Date(deadline*86400000).toISOString().slice(0,10):null};
 }
+
 function safeImage(value){return typeof value==='string'&&(value.startsWith('data:image/png;base64,')||value.startsWith('data:image/jpeg;base64,')||value.startsWith('data:image/webp;base64,')||value.startsWith('./assets/'))}
 function applyTheme(theme){
  const t={...DEFAULT_THEME,...theme};activeTheme=t;const root=document.documentElement;
@@ -31,7 +33,7 @@ function applyScheduleColors(){
  document.querySelectorAll('#schedule .day').forEach((card,i)=>{const prefix='day'+parity+i;card.style.setProperty('--c',t[prefix+'Accent']);card.style.background=t[prefix+'Background'];card.style.color=t[prefix+'Text'];const head=card.querySelector('.dayhead');if(head)head.style.background=t[prefix+'Header']});
 }
 function renderStreak(theme=savedTheme){
- const info=streakInfo(portalData.visitDates),state=!info.active?'Off':info.remaining<=2?'Warning':'Happy';
+ const info=streakInfo(portalData.visitDates,moscowDate(),portalData.visitWindows||portalData.studentCard?.visitWindows||[]),state=!info.active?'Off':info.remaining<=2?'Warning':'Happy';
  const img=document.getElementById('streakMascot'),custom=theme['mascot'+state];img.src=safeImage(custom)?custom:'./assets/cheburashka-'+state.toLowerCase()+'.svg';
  document.getElementById('streakBox').classList.toggle('streak-off',!info.active);
  document.getElementById('streakCount').textContent=info.active?'🔥 '+info.count+' '+daysWord(info.count)+' занятий в серии':'Огонёк ждёт тебя';
