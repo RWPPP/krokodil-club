@@ -187,10 +187,10 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 </div><div id="adminDesignTab" role="tabpanel" aria-labelledby="adminTabDesign" hidden><section id="themeEditor" class="panel hidden" style="margin-top:18px"><h3>Оформление сайта</h3><p class="sub">Меняй цвета и готовые картинки. Предпросмотр виден только тебе до применения.</p><p id="hexHelp" class="theme-note">Все цвета: HEX #RRGGBB, например #22C05B. PNG, JPEG, WebP — без сжатия и обрезки. Главная картинка: до 730 КБ; остальные: до 130 КБ.</p><div id="themeImages" class="theme-grid"></div><div id="themeColors"></div><div class="theme-grid"><div class="field"><label for="theme-font">Шрифт</label><select id="theme-font" onchange="previewTheme()"><option value="system">Основной</option><option value="serif">С засечками</option><option value="rounded">Мягкий</option></select></div><div class="field"><label for="theme-radius">Скругления, px</label><input id="theme-radius" type="number" min="0" max="40" onchange="previewTheme()"></div></div><div class="theme-actions"><button onclick="previewTheme()">Предпросмотр</button><button onclick="saveTheme()">Применить для всех</button><button class="secondary" onclick="cancelThemePreview()">Отменить предпросмотр</button><button class="secondary" onclick="portalAction('restore_theme',{})">Вернуть предыдущую тему</button></div><p id="themeStatus" class="theme-note" role="status"></p></section></div></div></section>
 <div class="footer"><span>Крокодил · Музыкальный клуб ЛТУ</span><b>Обучение на инструментах, игра в группах и многое другое!</b></div>
 </div>
-<script src="./v2.js?render=1"></script>
+<script src="./v2.js?perf=20261101"></script>
 <script src="./drums.js?v=2"></script>
 <script src="./booking-weeks.js?v=1"></script>
-<script src="./admin-v1.js?v=2"></script>
+<script src="./admin-v1.js?perf=20261101"></script>
 <script src="./release-1.1.js?v=1"></script>
 <script>
 const DAYS=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
@@ -263,6 +263,7 @@ function loadDB(){return {bookings:[],extras:{}}}
 function saveDB(){throw new Error('Изменения сохраняются только на сервере')}
 function statusText(text){document.getElementById('connectionStatus').textContent=text}
 async function request(path,body,token){
+ if(path==='/rest/v1/rpc/club_portal'&&portalData.themeVersion)body={...body,payload:{...body.payload,themeVersion:portalData.themeVersion}};
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),120000);
  try{
   const response=await fetch(SUPABASE_URL+path,{method:'POST',headers:{apikey:PUBLIC_KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body),signal:controller.signal});
@@ -290,7 +291,14 @@ function applySnapshot(data){
  statusText('Общая база · неделя с '+data.monday);
  refreshWeekControls();updateBookingState();renderReleaseState();
 }
-async function refreshData(){
+let refreshPending=null;
+function refreshData(){
+ const monday=selectedMonday();
+ if(refreshPending&&refreshPending.monday===monday&&refreshPending.version===requestVersion)return refreshPending.promise;
+ const pending={monday,version:null,promise:null};refreshPending=pending;
+ pending.promise=refreshDataOnce().finally(()=>{if(refreshPending===pending)refreshPending=null});pending.version=requestVersion;return pending.promise;
+}
+async function refreshDataOnce(){
  refreshMaintenance();
  const version=++requestVersion,monday=selectedMonday();onlineReady=false;document.getElementById('submitBtn').disabled=true;
  try{await ensureSession();const [data,portal]=await Promise.all([request('/rest/v1/rpc/club_api',{action:'snapshot',payload:{monday}},authSession.access_token),request('/rest/v1/rpc/club_portal',{action:'snapshot',payload:{notificationsOffset:adminUI.notificationsOffset}},authSession.access_token)]);if(version===requestVersion&&monday===selectedMonday()){applySnapshot(data);renderPortal(portal);if(initialLoading)await finishInitialLoad()}}

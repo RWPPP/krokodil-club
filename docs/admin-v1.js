@@ -82,9 +82,14 @@ renderAttendance=function(data){renderAdminVisits(data)};
 const adminOriginalRenderPortal=renderPortal;
 renderPortal=function(data){adminUI.portal=data;adminUI.notificationsOffset=data.notificationsOffset||0;adminOriginalRenderPortal(data);renderAdminRequests();renderAdminWorkspace()};
 async function adminPortalAction(action,payload={}){
- if(busy||!isAdmin)return;busy=true;renderAdminVisits(adminUI.portal);renderAdminBell();renderAdminRequests();
- try{await ensureSession();const session=authSession;const data=await request('/rest/v1/rpc/club_portal',{action,payload:{notificationsOffset:adminUI.notificationsOffset,...payload}},session.access_token);if(authSession===session)renderPortal(data)}catch(e){alert(e.message)}finally{busy=false;renderAdminVisits(adminUI.portal);renderAdminBell();renderAdminRequests();updateBookingState()}
+ if(busy||!isAdmin)return;busy=true;++requestVersion;
+ let status=document.getElementById('attendanceSaveStatus');if(!status){status=adminEl('p',undefined,'notice');status.id='attendanceSaveStatus';status.setAttribute('role','status');document.getElementById('attendanceBookings').before(status)}
+ const attendanceAction=['attendance','missed','undo_attendance'].includes(action);
+ if(attendanceAction)status.textContent='Сохраняем отметку…';
+ renderAdminVisits(adminUI.portal);renderAdminBell();renderAdminRequests();
+ try{await ensureSession();const session=authSession;const data=await request('/rest/v1/rpc/club_portal',{action,payload:{notificationsOffset:adminUI.notificationsOffset,...payload}},session.access_token);if(authSession===session){renderPortal(data);if(attendanceAction)status.textContent='Отметка сохранена'}}catch(e){if(attendanceAction)status.textContent='Сохранение не подтверждено. Обновите данные перед повторной отметкой. '+e.message;else alert(e.message)}finally{busy=false;renderAdminVisits(adminUI.portal);renderAdminBell();renderAdminRequests();updateBookingState()}
 }
+
 function toggleAdminNotifications(){adminUI.noticesOpen=!adminUI.noticesOpen;renderAdminBell()}
 function adminCreatedLabel(value){return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'}).format(new Date(value))+' МСК'}
 async function openAdminNotice(notice){
