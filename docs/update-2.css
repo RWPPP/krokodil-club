@@ -3,3 +3,10 @@
 @media(max-width:600px){.wrap{padding:16px 12px 40px}.panel{padding:18px;border-radius:20px}.u2-cabinet-grid{grid-template-columns:1fr}.u2-cabinet-grid .u2-section:last-child{grid-column:auto}.u2-cabinet-grid>.notice{grid-column:auto}.nav{width:100%;gap:4px;flex-wrap:wrap}.nav button{min-width:0;flex:1;padding:10px 8px;min-height:44px;font-size:13px}.nav-image{max-width:100%;height:34px}.brand-upload{max-width:min(240px,75vw)}.field input,.field select,.field textarea,input[type=search]{font-size:16px;min-height:48px;max-width:100%}.hero{padding:24px 20px 0;grid-template-columns:1fr}.hero.compact{padding:24px 20px}.hero h2{font-size:clamp(34px,10vw,60px)}.u2-week-nav{max-width:none}#u2StudentList button{width:100%}.u2-actions button{flex:1}.u2-submit-bar .primary{min-height:52px}.dayhead{padding:12px 10px}.slot{padding:12px 10px}button{touch-action:manipulation}.u2-music-fact{max-width:90vw}}
 @media(max-width:380px){.days{grid-template-columns:1fr}.nav button{font-size:12px}.u2-week-nav{grid-template-columns:44px minmax(0,1fr) 44px}.u2-week-nav strong{font-size:14px}}
 @supports(padding:env(safe-area-inset-bottom)){.wrap{padding-bottom:max(40px,env(safe-area-inset-bottom))}}
+
+/* Keep the original loader centred; facts sit below without changing its box. */
+#siteLoader .loading-content{position:relative}
+#siteLoader .loading-content .u2-music-fact{position:absolute;top:100%;left:0;right:0;max-width:none;margin:20px 0 0;padding:0;text-align:center}
+.u2-student-directory>summary{cursor:pointer;font-weight:800;font-size:21px;line-height:1.4;padding:4px 0;margin-bottom:16px}
+.u2-student-directory:not([open])>summary{margin-bottom:0}
+@media(max-height:520px){#siteLoader .loading-content .u2-music-fact{position:static;margin-top:20px}#siteLoader{overflow-y:auto}}

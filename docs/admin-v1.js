@@ -19,12 +19,12 @@ function adminFilteredBookings(){
 function adminPager(root,total,page,onPage){root.replaceChildren();const pages=Math.ceil(total/ADMIN_PAGE_SIZE);if(pages<=1)return;
  const previous=adminButton('← Назад',()=>onPage(page-1)),next=adminButton('Далее →',()=>onPage(page+1));previous.disabled=page<=0;next.disabled=page>=pages-1;root.append(previous,adminEl('span',`${page+1} / ${pages}`),next);
 }
-function setAdminSection(section){if(!['bookings','attendance','design'].includes(section))return;adminUI.section=section;renderAdminWorkspace()}
+function setAdminSection(section){if(!['bookings','attendance','students','design'].includes(section))return;adminUI.section=section;renderAdminWorkspace()}
 function setAdminRequestFilter(key,value){if(!['instrument','period','scope','search'].includes(key))return;adminUI[key]=value;if(key==='period'&&value==='past'){adminUI.scope='all';document.getElementById('requestScope').value='all'}adminUI.page=0;renderAdminRequests()}
 function setAdminAttendanceFilter(key,value){if(key==='state')adminUI.visitState=value;else adminUI.visitInstrument=value;adminUI.visitPage=0;renderAdminVisits(adminUI.portal)}
 function renderAdminWorkspace(){
  const workspace=document.getElementById('adminWorkspace');workspace.hidden=!isAdmin;document.getElementById('adminUpdateNotice').hidden=!isAdmin||!adminUI.portal?.admin||adminUI.portal.adminVersion===1;
- for(const [key,suffix] of [['bookings','Bookings'],['attendance','Attendance'],['design','Design']]){
+ for(const [key,suffix] of [['bookings','Bookings'],['attendance','Attendance'],['students','Students'],['design','Design']]){
   const active=adminUI.section===key;document.getElementById('admin'+suffix+'Tab').hidden=!active;const tab=document.getElementById('adminTab'+suffix);tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));tab.setAttribute('aria-controls','admin'+suffix+'Tab');
  }
  renderAdminBell();
@@ -117,4 +117,4 @@ function renderAdminBell(){
  root.appendChild(adminEl('p','Уведомления за последние 90 дней. Список обновляется вместе с данными сайта.','sub'));
 }
 
-document.querySelector('.admin-tabs').addEventListener('keydown',event=>{const tabs=[...document.querySelectorAll('.admin-tabs [role="tab"]')],index=tabs.indexOf(event.target);if(index<0)return;let next=index;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();setAdminSection(['bookings','attendance','design'][next]);tabs[next].focus()});
+document.querySelector('.admin-tabs').addEventListener('keydown',event=>{const tabs=[...document.querySelectorAll('.admin-tabs [role="tab"]')],index=tabs.indexOf(event.target);if(index<0)return;let next=index;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();setAdminSection(['bookings','attendance','students','design'][next]);tabs[next].focus()});
