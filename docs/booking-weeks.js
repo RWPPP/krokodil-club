@@ -17,14 +17,18 @@ function refreshWeekControls(){
    button.classList.toggle('active',selected===monday);button.setAttribute('aria-pressed',String(selected===monday));button.dataset.parity=parity;
   }
  }
+ renderU2WeekNav();
  const adminLabel=document.getElementById('adminWeekLabel');if(adminLabel)adminLabel.textContent='С '+dateLabel(selected)+' · '+(weekParity(selected)==='odd'?'нечётная':'чётная');
 }
 function updateBookingState(){
  const open=isBookingWeekOpen(),button=document.getElementById('submitBtn'),notice=document.getElementById('bookingWindowNotice');
- button.disabled=!open||!onlineReady||busy||(releaseMaintenance.mode==='full'&&!isAdmin);
+ const inst=document.getElementById('instrument').value;button.disabled=!open||!onlineReady||busy||!inst||!selected.length||(inst==='drums'&&!u2DrumsAllowed())||(releaseMaintenance.mode==='full'&&!isAdmin);
+ renderU2Selection();
  button.textContent=open?(document.getElementById('instrument').value==='drums'?'Отправить доступность':'Подтвердить запись'):'Текущая неделя — только просмотр';
  document.getElementById('scheduleTitle').textContent=open?(document.getElementById('instrument').value==='drums'?'Когда ты можешь прийти?':'Выбирай время'):'Расписание текущей недели';
  if(!open)document.getElementById('scheduleNote').textContent='Неделя уже началась. Запись закрыта, расписание доступно для просмотра.';
  else document.getElementById('scheduleNote').textContent=document.getElementById('instrument').value==='drums'?'Отметь все подходящие будущие слоты, даже занятые: при распределении возможны перестановки. Это предпочтения, не подтверждённая запись.':'Выбери один слот на неделю.';
+ if(!inst)document.getElementById('scheduleTitle').textContent='Выберите свой инструмент';
+ if(inst==='drums'&&!u2DrumsAllowed()){document.getElementById('scheduleNote').textContent='После посещения барабанов пропускаем одну неделю. Следующая запись с '+dateLabel(portalData.studentCard.nextDrumMonday);}
  if(notice)notice.textContent=open?'Запись на неделю с '+dateLabel(selectedMonday())+'. Также доступна запись на неделю после неё.':'Запись на текущую неделю закрыта. Расписание и ваши записи доступны для просмотра. Для записи выберите одну из двух следующих недель.';
 }

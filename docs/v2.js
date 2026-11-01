@@ -56,7 +56,7 @@ function renderPortal(data){
   const when=confirmed?(delta===0?'Сегодня':delta===1?'Завтра':'Через '+delta+' '+daysWord(delta)):b.status==='waitlist'?'В списке ожидания':'Ждёт распределения';
   card.innerHTML=`<strong>${esc(INSTR[b.instrument]||b.instrument)}</strong><div>${confirmed?esc(dateLabel(b.date))+' · '+esc(b.time):'Неделя с '+esc(dateLabel(b.monday))+' · '+(b.preferences||[]).length+' подходящих слотов'}</div><div class="countdown">${esc(when)}</div>`;future.appendChild(card);
  }
- renderAttendance(data);renderStreak(activeTheme);
+ renderAttendance(data);renderStreak(activeTheme);renderUpdate2(data);updateBookingState();
  if(!themePreview)fillThemeForm(savedTheme);
 }
 function renderAttendance(data){
@@ -124,7 +124,7 @@ async function finishInitialLoad(){
  const images=['uploadedLogo','heroImage'].map(id=>document.getElementById(id)).concat([...document.querySelectorAll('.nav-image')]).filter(img=>!img.hidden&&img.src);
  let timer;
  try{await Promise.race([Promise.all(images.map(img=>typeof img.decode==='function'?img.decode():Promise.resolve())),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Изображения ещё загружаются')),15000)})]);
- if(attempt!==loadingAttempt)return;initialLoading=false;document.getElementById('siteLoader').hidden=true;document.body.classList.remove('site-loading');
+ if(attempt!==loadingAttempt)return;initialLoading=false;stopMusicFacts();document.getElementById('siteLoader').hidden=true;document.body.classList.remove('site-loading');
  }finally{clearTimeout(timer)}
 }
 function showLoadingError(){document.getElementById('siteLoader').classList.add('loading-error');document.getElementById('loadingTitle').textContent='Волна немного задержалась 💚';document.getElementById('loadingSubtitle').textContent='Не удалось загрузить сайт. Проверь интернет и попробуй ещё раз.';document.getElementById('loadingRetry').hidden=false}
