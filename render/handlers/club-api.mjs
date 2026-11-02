@@ -28,8 +28,8 @@ export default async function handler(req){
  try{
   const upstream=await fetch(UPSTREAM+path+url.search,{method:'POST',headers,body,redirect:'error',signal:AbortSignal.timeout(25000)});
   const data=await upstream.text();
-  if(!(upstream.headers.get('content-type')||'').includes('application/json'))return response(502,'База временно недоступна. Повторите позже');
-  return new Response(data,{status:upstream.status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+  if(upstream.status!==204&&!(upstream.headers.get('content-type')||'').includes('application/json'))return response(502,'База временно недоступна. Повторите позже');
+  return new Response(upstream.status===204?null:data,{status:upstream.status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
  }catch{return response(502,'Не удалось связаться с базой. Обновите страницу через минуту')}
 }
 export const config={path:'/club-api/*'};

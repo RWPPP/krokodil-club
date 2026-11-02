@@ -188,7 +188,7 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 </div><div id="adminStudentsTab" role="tabpanel" aria-labelledby="adminTabStudents" hidden></div><div id="adminDesignTab" role="tabpanel" aria-labelledby="adminTabDesign" hidden><section id="themeEditor" class="panel hidden" style="margin-top:18px"><h3>Оформление сайта</h3><p class="sub">Меняй цвета и готовые картинки. Предпросмотр виден только тебе до применения.</p><p id="hexHelp" class="theme-note">Все цвета: HEX #RRGGBB, например #22C05B. PNG, JPEG, WebP — без сжатия и обрезки. Главная картинка: до 730 КБ; остальные: до 130 КБ.</p><div id="themeImages" class="theme-grid"></div><div id="themeColors"></div><div class="theme-grid"><div class="field"><label for="theme-font">Шрифт</label><select id="theme-font" onchange="previewTheme()"><option value="system">Основной</option><option value="serif">С засечками</option><option value="rounded">Мягкий</option></select></div><div class="field"><label for="theme-radius">Скругления, px</label><input id="theme-radius" type="number" min="0" max="40" onchange="previewTheme()"></div></div><div class="theme-actions"><button onclick="previewTheme()">Предпросмотр</button><button onclick="saveTheme()">Применить для всех</button><button class="secondary" onclick="cancelThemePreview()">Отменить предпросмотр</button><button class="secondary" onclick="portalAction('restore_theme',{})">Вернуть предыдущую тему</button></div><p id="themeStatus" class="theme-note" role="status"></p></section></div></div></section>
 <div class="footer"><span>Крокодил · Музыкальный клуб ЛТУ</span><b>Обучение на инструментах, игра в группах и многое другое!</b></div>
 </div>
-<script src="./v2.js?update=2.2"></script>
+<script src="./v2.js?update=2.3-gateway"></script>
 <script src="./drums.js?v=2"></script>
 <script src="./booking-weeks.js?update=2"></script>
 <script src="./admin-v1.js?update=2.1"></script>
@@ -257,7 +257,7 @@ function refreshStudyWeek(){
  // Переключаем расписание при первом открытии и при смене учебной недели.
  const calendarMonday=currentBookingMonday();if(lastStudyWeek!==calendarMonday){lastStudyWeek=calendarMonday;setWeek(1)}else refreshWeekControls();
 }
-const SUPABASE_URL='https://krokodil-proxy-test.onrender.com/club-api';
+const SUPABASE_URL='https://krokodil-gateway.de.deplexo.com/club-api';
 const PUBLIC_KEY='sb_publishable_krImotWHN9WdJriG2p60eQ_tk_xLbHi';
 let authSession=null, isAdmin=false, onlineReady=false, busy=false, requestVersion=0, occupancy={};
 const SESSION_KEY='krokodil_session_v1';
@@ -269,7 +269,7 @@ async function request(path,body,token){
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),120000);
  try{
   const response=await fetch(SUPABASE_URL+path,{method:'POST',headers:{apikey:PUBLIC_KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body),signal:controller.signal});
-  const data=await response.json();if(!response.ok)throw new Error(data.message||data.msg||data.error_description||'Ошибка подключения');return data;
+  const data=response.status===204?null:await response.json();if(!response.ok)throw new Error(data.message||data.msg||data.error_description||'Ошибка подключения');return data;
  }finally{clearTimeout(timeout)}
 }
 function rememberSession(s){authSession=s;localStorage.setItem(SESSION_KEY,JSON.stringify(s))}

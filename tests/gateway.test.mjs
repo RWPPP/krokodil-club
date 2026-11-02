@@ -7,6 +7,7 @@ import {test} from 'node:test';
 import {spawnSync} from 'node:child_process';
 import {createGateway} from '../deplexo-gateway/gateway.mjs';
 import {publicOrigin} from '../render/lib/public-origin.mjs';
+import clubApi from '../render/handlers/club-api.mjs';
 
 const FRONT = 'https://rwppp.github.io';
 const large = randomBytes(700000).toString('base64');
@@ -93,6 +94,16 @@ try {
   for(const value of ['http://krokodil.example','https://user:password@krokodil.example','https://krokodil.example/path','https://krokodil.example/?key=secret','https://krokodil.example/#fragment']) {
    assert.throws(()=>publicOrigin(value));
   }
+ });
+ await test('a successful sign-out preserves the upstream empty 204 response', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(null,{status:204});
+  try {
+   const r = await clubApi(new Request('https://gateway.example/club-api/auth/v1/logout',{
+    method:'POST',headers:{Origin:FRONT,Authorization:'Bearer fixture-token'},body:'{}'
+   }));
+   assert.equal(r.status,204); assert.equal(await r.text(),'');
+  } finally { globalThis.fetch = originalFetch; }
  });
  await test('VK authorization uses the configured gateway callback without changing the club frontend', async () => {
   const moduleUrl = new URL('../render/handlers/vk-start.mjs', import.meta.url).href;
