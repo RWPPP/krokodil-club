@@ -1,0 +1,14 @@
+[project]
+name = "Крокодил — шлюз"
+framework = "other"
+
+id = "01a19b6c-55dc-72ff-aa5c-a0e7e56afe52"
+[build]
+command = "node build.mjs"
+output_directory = "dist"
+
+[deploy]
+runtime = "node"
+compute = "process"
+entry = "server/server.mjs"
+health_check_path = false

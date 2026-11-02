@@ -72,7 +72,7 @@ async function loadPortal(){const session=authSession;const data=await request('
 async function portalAction(action,payload){
  if(busy)return;busy=true;try{await ensureSession();const data=await request('/rest/v1/rpc/club_portal',{action,payload},authSession.access_token);if(action==='save_theme'||action==='restore_theme')themePreview=false;renderPortal(data);if(action.includes('theme'))document.getElementById('themeStatus').textContent='Оформление сохранено для всех посетителей'}catch(e){alert(e.message)}finally{busy=false}
 }
-const RENDER_ORIGIN='https://krokodil-gateway.de.deplexo.com';
+const RENDER_ORIGIN='https://krokodil-gateway-martynov-makc-nzwb.onreza.app';
 function randomLoginValue(){return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 async function loginChallenge(verifier){return btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 async function startVKLogin(){
