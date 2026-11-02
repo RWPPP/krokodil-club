@@ -118,3 +118,16 @@ function renderAdminBell(){
 }
 
 document.querySelector('.admin-tabs').addEventListener('keydown',event=>{const tabs=[...document.querySelectorAll('.admin-tabs [role="tab"]')],index=tabs.indexOf(event.target);if(index<0)return;let next=index;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();setAdminSection(['bookings','attendance','students','design'][next]);tabs[next].focus()});
+
+async function cancelBookingsForDay(){
+ if(!isAdmin||busy)return;
+ const date=document.getElementById('cancelDayDate').value;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){alert('Выберите дату отмены');return}
+ let plan;busy=true;
+ try{await ensureSession();const result=await request('/rest/v1/rpc/club_api',{action:'preview_cancel_day',payload:{date}},authSession.access_token);plan=result.cancelDayPlan}
+ catch(e){alert(e.message);return}finally{busy=false}
+ if(!plan?.count){alert('На этот день нет будущих назначенных занятий');return}
+ if(confirm('Отменить ВСЕ назначенные записи на '+dateLabel(date)+' ('+plan.count+')?\nОтмена затронет все инструменты, независимо от фильтров. Срок огонька сохранится: +7 дней для гитары, +14 для барабанов. Посещения не добавятся.')){
+  if(await mutate('cancel_day',{date,planToken:plan.token}))alert('Отменено записей: '+plan.count);
+ }
+}
