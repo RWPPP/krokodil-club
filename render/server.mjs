@@ -4,7 +4,7 @@ import start from './handlers/vk-start.mjs';
 import callback from './handlers/vk-callback.mjs';
 import {redeemTicket} from './lib/handoff.mjs';
 import {FRONTEND,FRONT_ORIGIN,UPSTREAM} from './lib/auth-utils.mjs';
-const SITE='https://krokodil-proxy-test.onrender.com';
+import {SITE} from './lib/public-origin.mjs';
 const server=http.createServer(async(req,res)=>{
  const origin=req.headers.origin,path=new URL(req.url,SITE).pathname;
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');

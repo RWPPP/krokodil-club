@@ -1,0 +1,8 @@
+version: 1
+type: web
+build:
+  framework: dockerfile
+  root_dir: deplexo-gateway
+  dockerfile: Dockerfile
+run:
+  port: 3000
