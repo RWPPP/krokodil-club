@@ -52,7 +52,7 @@ function renderAdminRequests(){
   const manual=portalData.manualBookings?.find(x=>x.id===b.id);
   if(manual){details.appendChild(adminEl('small',manual.userId?'Добавлено администратором':'Добавлено администратором · без аккаунта'));if(editable&&!info.past&&!info.ended&&!b.outcome){const edit=adminButton('Изменить',()=>openManualBooking(b,manual));edit.disabled=busy;actions.appendChild(edit)}}
   if(editable&&b.instrument==='drums'&&!info.ended&&!b.outcome){const button=adminButton(b.slotId?'Переназначить':'Назначить',async()=>{if(await adminPrepareWeek(monday))await assignOne(b.id)});button.disabled=busy||!!(b.slotId&&info.past);actions.appendChild(button)}
-  if(editable){const button=adminButton('Удалить',async()=>{if(await adminPrepareWeek(monday))await removeBooking(b.id)},'small danger');button.disabled=busy;actions.appendChild(button)}
+  if(editable&&!info.past&&!info.ended&&!b.outcome){for(const preserve of [false,true]){if(preserve&&!b.slotId)continue;const button=adminButton(preserve?'Отменить без потери огонька':'Отменить запись',async()=>{if(await adminPrepareWeek(monday))await cancelLesson(b,preserve)},preserve?'small secondary':'small danger');button.disabled=busy;actions.appendChild(button)}}
   row.append(details,actions);root.appendChild(row);
  }
  if(!rows.length)root.appendChild(adminEl('p','В этом разделе заявок нет. Можно изменить фильтры или выбрать все недели.','sub'));

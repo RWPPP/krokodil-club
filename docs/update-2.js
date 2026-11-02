@@ -18,7 +18,7 @@ function u2DrawBookings(root,card){
  root.replaceChildren();if(!card?.bookings?.length){root.appendChild(u2El('p','Нет заявок на текущую и будущие недели.','sub'));return}
  for(const b of card.bookings){const box=u2El('article',undefined,'lesson-card');box.append(instrumentHeading(b.instrument),u2El('p','Неделя с '+dateLabel(b.monday)));
   if(b.instrument==='drums'){const details=u2El('details');details.appendChild(u2El('summary','Твоя доступность · '+(b.preferences||[]).length+' вариантов'));const list=u2El('ul');for(const id of b.preferences||[])list.appendChild(u2El('li',drumSlotLabel(id,b.monday)));details.appendChild(list);box.appendChild(details);box.appendChild(u2El('p',b.status==='assigned'&&b.slotId?'Назначенное занятие: '+drumSlotLabel(b.slotId,b.monday):b.status==='waitlist'?'Ожидает свободного места':'Ждёт распределения'))}
-  else box.appendChild(u2El('p',drumSlotLabel(b.slotId,b.monday)));root.appendChild(box);
+  else box.appendChild(u2El('p',drumSlotLabel(b.slotId,b.monday)));if(b.canCancel){const cancel=u2Button('Отменить запись',()=>cancelLesson(b,false));cancel.disabled=busy;box.appendChild(cancel)}root.appendChild(box);
  }
 }
 function u2DrawHistory(root,card,viewer=false){
@@ -58,7 +58,7 @@ function u2RenderOwn(){const card=u2.own;const own=document.getElementById('u2Ow
 function u2RenderViewer(){const root=document.getElementById('u2StudentViewer');if(!root||!isAdmin)return;root.replaceChildren();const card=u2.viewer;if(!card)return;root.append(u2El('h3',card.profile?.name||'Кабинет ученика'),u2El('p','Просмотр администратором · изменения задач недоступны','sub'));
  const bookings=u2Section('Заявки и доступность'),history=u2Section('История занятий'),tasks=u2Section('Личные задачи');for(const section of [bookings,history,tasks]){const body=u2El('div');section.appendChild(body);root.appendChild(section)}
  u2DrawBookings(bookings.lastChild,card);u2DrawHistory(history.lastChild,card,true);u2DrawTasks(tasks.lastChild,card,false);
- const progress=streakInfo(card.visitDates||[],moscowDate(),card.visitWindows||[]);root.prepend(u2El('p','Всего посещено: '+(card.attendedTotal||0)+' · дней с занятиями: '+progress.total+' · текущая серия: '+progress.count+' · лучшая серия: '+progress.best,'sub'));
+ const progress=streakInfo(card.visitDates||[],moscowDate(),card.visitWindows||[],card.protectedCancellations||[]);root.prepend(u2El('p','Всего посещено: '+(card.attendedTotal||0)+' · дней с занятиями: '+progress.total+' · текущая серия: '+progress.count+' · лучшая серия: '+progress.best,'sub'));
 }
 function u2RenderDirectory(){const list=document.getElementById('u2StudentList'),search=document.getElementById('u2StudentSearch');if(!list||!isAdmin)return;list.replaceChildren();const matches=u2.students.filter(p=>p.name.toLocaleLowerCase('ru').includes(search.value.toLocaleLowerCase('ru')));for(const p of matches.slice(0,50))list.appendChild(u2Button(p.name+' · '+p.id.slice(0,8),()=>u2LoadCard(p.id,0,true)));if(matches.length>50)list.appendChild(u2El('p','Уточните имя: показаны первые 50 совпадений.','sub'));if(!matches.length)list.appendChild(u2El('p','Совпадений нет.','sub'))}
 function renderUpdate2(data){

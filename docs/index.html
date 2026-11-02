@@ -188,12 +188,12 @@ body.site-loading{overflow:hidden}body.site-loading>.wrap{visibility:hidden}#sit
 </div><div id="adminStudentsTab" role="tabpanel" aria-labelledby="adminTabStudents" hidden></div><div id="adminDesignTab" role="tabpanel" aria-labelledby="adminTabDesign" hidden><section id="themeEditor" class="panel hidden" style="margin-top:18px"><h3>Оформление сайта</h3><p class="sub">Меняй цвета и готовые картинки. Предпросмотр виден только тебе до применения.</p><p id="hexHelp" class="theme-note">Все цвета: HEX #RRGGBB, например #22C05B. PNG, JPEG, WebP — без сжатия и обрезки. Главная картинка: до 730 КБ; остальные: до 130 КБ.</p><div id="themeImages" class="theme-grid"></div><div id="themeColors"></div><div class="theme-grid"><div class="field"><label for="theme-font">Шрифт</label><select id="theme-font" onchange="previewTheme()"><option value="system">Основной</option><option value="serif">С засечками</option><option value="rounded">Мягкий</option></select></div><div class="field"><label for="theme-radius">Скругления, px</label><input id="theme-radius" type="number" min="0" max="40" onchange="previewTheme()"></div></div><div class="theme-actions"><button onclick="previewTheme()">Предпросмотр</button><button onclick="saveTheme()">Применить для всех</button><button class="secondary" onclick="cancelThemePreview()">Отменить предпросмотр</button><button class="secondary" onclick="portalAction('restore_theme',{})">Вернуть предыдущую тему</button></div><p id="themeStatus" class="theme-note" role="status"></p></section></div></div></section>
 <div class="footer"><span>Крокодил · Музыкальный клуб ЛТУ</span><b>Обучение на инструментах, игра в группах и многое другое!</b></div>
 </div>
-<script src="./v2.js?update=2.4-onreza"></script>
+<script src="./v2.js?update=2.5-cancellations"></script>
 <script src="./drums.js?v=2"></script>
 <script src="./booking-weeks.js?update=2"></script>
-<script src="./admin-v1.js?update=2.1"></script>
+<script src="./admin-v1.js?update=2.5-cancellations"></script>
 <script src="./release-1.1.js?v=1"></script>
-<script src="./update-2.js?v=2.2"></script>
+<script src="./update-2.js?update=2.5-cancellations"></script>
 <script>
 const DAYS=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 const SHORT=['Пн','Вт','Ср','Чт','Пт','Сб'];
@@ -333,7 +333,13 @@ async function submitBooking(){
  if(await mutate('submit',{name,instrument,own:instrument!=='drums'&&document.getElementById('own').checked,slotId:selected[0],preferences:selected.slice()}))u2BookingMessage(instrument==='drums'?'Заявка сохранена. Доступность отправлена администратору.':'Заявка сохранена. Запись подтверждена.');
 }
 async function addExtra(slotId,instrument){const amount=prompt('Количество дополнительных мест (0–20)',String((db.extras[slotId+'|'+instrument]||0)+1));if(amount===null)return;const n=Number(amount);if(!Number.isInteger(n)||n<0||n>20){alert('Введите целое число от 0 до 20');return}await mutate('extra',{slotId,instrument,amount:n})}
-async function removeBooking(id){if(confirm('Удалить заявку?'))await mutate('delete',{id})}
+async function cancelLesson(booking,preserveStreak=false){
+ const own=portalData.studentCard?.bookings?.find(b=>b.id===booking.id),revision=booking.revision||own?.revision||portalData.manualBookings?.find(b=>b.id===booking.id)?.revision;
+ if(!revision){alert('Обновите данные записи перед отменой');return}
+ const message=preserveStreak?'Отменить занятие без вины студента? Срок огонька продлится на '+(booking.instrument==='drums'?14:7)+' дней. Посещение не добавится.':'Отменить запись? Место освободится. Счётчик огонька сейчас не изменится, прежний срок сохранится.';
+ if(confirm(message))await mutate('cancel',{id:booking.id,revision,preserveStreak});
+}
+async function removeBooking(id){const b=db.bookings.find(b=>b.id===id);if(b)await cancelLesson(b,false)}
 async function legacyAutoAssignDrums(){if(confirm('Пересчитать всех барабанщиков? Ручные назначения этой недели тоже будут пересчитаны.'))await mutate('distribute',{})}
 async function legacyAssignOne(id){const b=db.bookings.find(x=>x.id===id);if(!b)return;const choices=b.preferences.filter(sid=>booked({id:sid},'drums')===0);if(!choices.length){alert('Подходящие слоты заняты');return}const answer=prompt(choices.map((sid,i)=>{const s=getSlot(sid);return `${i+1}. ${DAYS[s.day]} ${s.time}`}).join('\n'),'1');if(answer===null)return;const i=Number(answer)-1;if(!Number.isInteger(i)||!choices[i])return;await mutate('assign',{id,slotId:choices[i]})}
 async function loginAdmin(event){
